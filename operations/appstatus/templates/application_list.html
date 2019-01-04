@@ -1,0 +1,39 @@
+
+
+{% block app_list %}
+    {% for application in object_list %}
+       <div class="col-xs-12 col-sm-4 col-md-3">
+       {% if not application.appok %}
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><b>{{ application.name }}</b></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div>Reason: {{ application.failreason  }}</div>
+                        <div><i>Updated {{ application.date_modified }}</i></div>
+                    </div>
+                </div>
+       {% elif not application.appok_rel %}
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><b>{{ application.name }}</b></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div>Failed due to dependency on: <b>{{ application.failedbecauseof }}</b></div>
+                        <div><i>Updated {{ application.date_modified }}</i></div>
+                    </div>
+                </div>
+       {% else %}
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><b>{{ application.name }}</b></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div>Application ok.</div>
+                        <div><i>Updated {{ application.date_modified }}</i></div>
+                    </div>
+                </div>
+       {% endif %}
+       </div>
+    {% endfor %}
+{% endblock %}

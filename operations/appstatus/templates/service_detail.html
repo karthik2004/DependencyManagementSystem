@@ -1,0 +1,27 @@
+<div class="container">
+<div>Information for application: <h1>{{ object.name }}</h1></div>
+<div>Application is ok? {{ object.appok_rel }}</div>
+<br>
+<div>
+<u>{{ object.name }} is serving the following services:</u>
+</div>
+<br>
+{% for service in object.services.all %}
+<div>{{ service.name }}  is ok: {{ service.serviceok_rel }}{% if service.get_all_deps  %} &bull; Consumers: {{ service.get_all_deps }} {% endif  %}</div>
+{% endfor %}
+</div>
+
+
+<script>
+$('#statusModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var application = button.data('application') // Extract info from data-* attributes
+  var application_id = button.data('application_id') // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content.
+  // We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('Changing the status for ' + application)
+  modal.find('.modal-body input#id_application').val(application_id)
+})
+</script>

@@ -1,0 +1,95 @@
+{% block app_list %}
+    {% for application in object_list|dictsort:"appok_rel" %}
+       <div class="col-xs-12 col-sm-4 col-md-3">
+       {% if not application.appok %}
+          <div class="panel panel-danger">
+              <div class="panel-heading">
+              {% if request.user.is_authenticated %}
+                  <button type="button panel-title" class="btn btn-success pull-right" data-toggle="modal" data-target="#statusModal" data-application="{{ application }}" data-application_id="{{ application.id }}"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                  </button>
+              {% endif %}
+                  <a href='/applications/{{ application.id }}'><h3 class="panel-title">{{ application.name }}</h3></a>
+                  Updated {{ application.app_updated }}
+              </div>
+              <div class="panel-body">
+                  <div>All services down.</div>
+                  <div>Reason: {{ application.failreason }}</div>
+              </div>
+          </div>
+       {% elif not application.appok_rel %}
+          <div class="panel panel-warning">
+              <div class="panel-heading">
+              {% if request.user.is_authenticated %}
+                  <button type="button panel-title" class="btn btn-warning pull-right" data-toggle="modal" data-target="#statusModal" data-application="{{ application }}" data-application_id="{{ application.id }}"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                  </button>
+              {% endif %}
+                  <a href='/applications/{{ application.id }}'><h3 class="panel-title">{{ application.name }}</h3></a>
+                  Updated {{ application.app_updated }}
+              </div>
+              <div class="list-group">
+                  {% for service in application.services.all %}
+                    {% if service.serviceok_rel %}
+                      <p class="list-group-item list-group-item-success">{{ service.name }}</p>
+                    {% else %}
+                      <li class="list-group-item list-group-item-danger">{{ service.name }}<br>Reason: {{ service.failreason }}</li>
+                    {% endif %}
+                  {% endfor %}
+              </div>
+          </div>
+       {% else %}
+          <div class="panel panel-success">
+              <div class="panel-heading">
+              {% if request.user.is_authenticated %}
+                  <button type="button panel-title" class="btn btn-warning pull-right" data-toggle="modal" data-target="#statusModal" data-application="{{ application }}" data-application_id="{{ application.id }}"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                  </button>
+              {% endif %}
+                  <a href='/applications/{{ application.id }}'><h3 class="panel-title">{{ application.name }}</h3></a>
+                  Updated {{ application.app_updated }}
+              </div>
+              <div class="panel-body">
+                  <div>All services are up 'n running.</div>
+              </div>
+          </div>
+       {% endif %}
+       </div>
+    {% endfor %}
+<div class="clearfix"></div>
+<div class="modal fade" id="statusModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+      <form class="form-horizontal" method="post" action="/status_update/">
+        <input class="form-control application hidden" id="id_application" name="application" placeholder="Application*" type="text" required />
+        <br>
+        <input class="form-control" id="id_reason" name="reason" placeholder="Reason*" type="text" required />
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <input type="submit" class="btn btn-danger" name="action">{% csrf_token %}
+            </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}
+
+
+<script>
+$('#statusModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var application = button.data('application') // Extract info from data-* attributes
+  var application_id = button.data('application_id') // Extract info from data-* attributes
+  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+  // Update the modal's content.
+  // We'll use jQuery here, but you could use a data binding library or other methods instead.
+  var modal = $(this)
+  modal.find('.modal-title').text('Changing the status for ' + application)
+  modal.find('.modal-body input#id_application').val(application_id)
+})
+</script>
